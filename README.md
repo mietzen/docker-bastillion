@@ -9,11 +9,11 @@ There are now Github Actiona to build the image for:
 * `linux/arm64`
 * `linux/arm/v7`
 
-And to build `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0-alpine`) for:
+And to build a `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0-alpine`) for:
 * `linux/amd64`
 * `linux/arm64`
 
-The is a full upgrade path is available from the `latest` `e-COSI/docker-bastillion:3.09.00` image to `3.14.0`.
+The full upgrade path is available from the `latest` `e-COSI/docker-bastillion:3.09.00` image to `3.14.0`.
 
 For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags?page=1&ordering=name)
 
@@ -61,6 +61,31 @@ Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with:
 * Password: `changeme`
 
 See also: [docker-compose.yaml](docker-compose.yaml)
+
+## Build it your self
+
+### Ubuntu
+```Shell
+$ BASTILLION_VERSION=3.14.0
+$ BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
+$ if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0 
+$ docker build \
+   --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
+   --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
+   --no-cache -t bastillion:${BASTILLION_VERSION} \
+   --file ./Dockerfile .
+```
+### alpine
+```Shell
+$ BASTILLION_VERSION=3.14.0
+$ BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
+$ if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0
+$ docker build \
+   --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
+   --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
+   --no-cache -t bastillion:${BASTILLION_VERSION}-alpine \
+   --file ./Dockerfile.alpine .
+```
 
 ## Full Environment Variable list:
 _Dockerize is used to generate a configuration file for the application_
