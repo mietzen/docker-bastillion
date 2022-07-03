@@ -28,7 +28,7 @@ For more information visit the [Bastillion website](https://www.bastillion.io/) 
 
 ## Start with `docker run`
 Start Bastillion with `docker run` on your local host:
-```Shell
+```console
 $ docker run -d -p 8080:8080 -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
 ```
 
@@ -53,7 +53,7 @@ services:
 ```
 
 Run with:
-```Shell
+```console
 $ docker-compose up -d
 ```
 Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
@@ -65,7 +65,7 @@ See also: [docker-compose.yaml](docker-compose.yaml)
 ## Build it your self
 
 ### Ubuntu
-```Shell
+```console
 $ BASTILLION_VERSION=3.14.0
 $ BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
 $ if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0 
@@ -76,7 +76,7 @@ $ docker build \
    --file ./Dockerfile .
 ```
 ### alpine
-```Shell
+```console
 $ BASTILLION_VERSION=3.14.0
 $ BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
 $ if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0
