@@ -30,10 +30,6 @@ jobs:
         with:
           ref: ${{ matrix.tag }}
       - 
-        name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
-      - 
         name: Docker Login
         uses: docker/login-action@v2
         with:
@@ -49,7 +45,7 @@ jobs:
       -
         name: Build
         env:
-          BASTILLION_VERSION: ${{ steps.get_version.outputs.VERSION }}
+          BASTILLION_VERSION: ${{ matrix.tag }}
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
