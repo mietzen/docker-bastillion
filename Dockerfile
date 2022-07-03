@@ -1,6 +1,4 @@
-ARG ARCH
-
-FROM ${ARCH}/eclipse-temurin:18-jre
+FROM eclipse-temurin:18-jre
 LABEL maintainer="Nils Stein <social.nstein@mailbox.org>"
 RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM" > /log
 
