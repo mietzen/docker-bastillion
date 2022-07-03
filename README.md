@@ -18,7 +18,7 @@ For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags)
 The base images are automatically updated.
 
 ## Upgrade to the latest version
-Before upgrading to the next version make sure to read the [release notes](https://github.com/mietzen/bastillion/releases), check how to migrate your settings and database.
+Before upgrading to the next version make sure to read the [release notes](https://github.com/n-stone/docker-bastillion/releases), check how to migrate your settings and database.
 ## What is Bastillion?
 Bastillion is an open-source web-based SSH console that centrally manages administrative access to systems.
 A bastion host for administrators with features that promote infrastructure security, including key management and auditing.
