@@ -29,7 +29,7 @@ For more information visit the [Bastillion website](https://www.bastillion.io/) 
 ## Start with `docker run`
 Start Bastillion with `docker run` on your local host:
 ```console
-$ docker run -d -p 8080:8080 -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
+docker run -d -p 8080:8080 -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
 ```
 
 Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
@@ -38,7 +38,7 @@ Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with:
 
 ## Start using `docker-compose`
 
-```
+```yaml
 version: "3"
 services:
   bastillion:
@@ -54,7 +54,7 @@ services:
 
 Run with:
 ```console
-$ docker-compose up -d
+docker-compose up -d
 ```
 Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
 * Username: `admin`
@@ -66,21 +66,21 @@ See also: [docker-compose.yaml](docker-compose.yaml)
 
 ### Ubuntu
 ```console
-$ BASTILLION_VERSION=3.14.0
-$ BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
-$ if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0 
-$ docker build \
+BASTILLION_VERSION=3.14.0
+BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
+if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0 
+docker build \
    --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
    --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
    --no-cache -t bastillion:${BASTILLION_VERSION} \
    --file ./Dockerfile .
 ```
-### alpine
+### Alpine
 ```console
-$ BASTILLION_VERSION=3.14.0
-$ BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
-$ if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0
-$ docker build \
+BASTILLION_VERSION=3.14.0
+BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
+if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi # Fix for 3.14.0
+docker build \
    --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
    --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
    --no-cache -t bastillion:${BASTILLION_VERSION}-alpine \
