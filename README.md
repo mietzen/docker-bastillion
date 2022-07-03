@@ -87,5 +87,5 @@ docker build \
    --file ./Dockerfile.alpine .
 ```
 
-## Full Environment Variable list:
-See: [environment_list.md](environment_list.md)
+## Full list of environment variables:
+See: [all environment variables](environment_list.md)
