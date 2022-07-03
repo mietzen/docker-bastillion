@@ -16,47 +16,7 @@ jobs:
         run: |
           tags=$(python -c "import subprocess; import json; s = subprocess.Popen([\"curl -sSlq -X GET https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags | jq -r '.[].ref' | cut -d'/' -f3 | cut -d'v' -f2\"], shell=True, stdout=subprocess.PIPE).stdout; print(json.dumps(s.read().decode('utf-8').splitlines()))")
           echo "::set-output name=TAGS::{\"tag\":$tags}"     
-  build-ubuntu:
-    runs-on: ubuntu-latest
-    needs: setup
-    strategy:
-      matrix: ${{fromJson(needs.setup.outputs.matrix)}}
-    steps:
-      - 
-        run: echo ${{ matrix.tag }}
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ matrix.tag }}
-      - 
-        name: Docker Login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_DEPLOY_KEY }}
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Build
-        env:
-          BASTILLION_VERSION: ${{ matrix.tag }}
-          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-        run: |
-          BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
-          # Fix for 3.14.0
-          if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
-          docker buildx build -t "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}" \
-            --platform linux/amd64,linux/arm64,linux/arm/v7 \
-            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
-            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
-            --push .
-  build-alpine:
+  build:
     runs-on: ubuntu-latest
     needs: setup
     strategy:
@@ -96,3 +56,8 @@ jobs:
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
             --push --file ./Dockerfile.alpine .
+          docker buildx build -t "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}" \
+            --platform linux/amd64,linux/arm64,linux/arm/v7 \
+            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
+            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
+            --push .
