@@ -1,11 +1,14 @@
 # Bastillion Docker Image
-This is a fork of [e-COSI/docker-bastillion](https://github.com/e-COSI/docker-bastillion) Docker image for [Bastillion.io](https://www.bastillion.io/) by developed by [e-COSI](https://github.com/e-COSI).
+**This is a fork of: [e-COSI/docker-bastillion](https://github.com/e-COSI/docker-bastillion) Docker image for [Bastillion.io](https://www.bastillion.io/)**
+
+**Developed by: [e-COSI](https://github.com/e-COSI)**
+
 I updated the deprecated base image to [eclipse-temurin:18-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
 * `linux/amd64`
 * `linux/arm64`
 * `linux/arm/v7`
 
-The Docker images are automatically tage with the bastillion version.
+The Docker images are automatically taged with the bastillion version.
 
 ## Upgrade to the latest version
 Before upgrading to the next version make sure to read the [release notes](https://github.com/bastillion-io/Bastillion/releases), check if you need to migrate your settings and database.
@@ -44,6 +47,9 @@ Run with:
 ```Shell
 $ docker-compose up -d
 ```
+Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
+* Username: `admin`
+* Password: `changeme`
 
 See also: [docker-compose.yaml](docker-compose.yaml)
 
