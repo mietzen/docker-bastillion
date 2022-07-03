@@ -1,53 +1,36 @@
-FROM openjdk:9-slim
-
-LABEL maintainer="Nils Stein <social.nstein@mailbox.org>"
-
 ARG BASTILLION_VERSION
 ARG BASTILLION_FILENAME_VERSION
-ARG DOCKERIZE_VERSION
+ARG ARCH
+
+FROM ${ARCH}/eclipse-temurin:18-jre
+LABEL maintainer="Nils Stein <social.nstein@mailbox.org>"
 
 ENV BASTILLION_VERSION=${BASTILLION_VERSION} \
     BASTILLION_FILENAME=${BASTILLION_FILENAME_VERSION} \
-    DOCKERIZE_VERSION=${DOCKERIZE_VERSION}
+    DOCKERIZE_VERSION=0.6.1
 
-RUN apt-get update && apt-get -y install wget && \
-    wget --quiet https://github.com/bastillion-io/Bastillion/releases/download/v${BASTILLION_VERSION}/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz && \
-    wget --quiet https://github.com/jwilder/dockerize/releases/download/v${DOCKERIZE_VERSION}/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz && \
-    tar xzf bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz -C /opt && \
-    tar xzf dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz -C /usr/local/bin && \
+ADD https://github.com/bastillion-io/Bastillion/releases/download/v${BASTILLION_VERSION}/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz /tmp/
+ADD https://github.com/jwilder/dockerize/releases/download/v${DOCKERIZE_VERSION}/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz /tmp/
+
+RUN tar xzf /tmp/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz -C /opt && \
+    tar xzf /tmp/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz -C /usr/local/bin && \
     mv /opt/Bastillion-jetty /opt/bastillion && \
-    rm bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz && \
-    apt-get remove --purge -y wget && apt-get -y autoremove && rm -rf /var/lib/apt/lists/* && \
-    # create db directory for later permission update
+    rm /tmp/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz /tmp/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz && \
     mkdir /opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb && \
-    # remove default config - will be written by dockerize on startup
+    ln -s /opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb /keydb && \
     rm /opt/bastillion/jetty/bastillion/WEB-INF/classes/BastillionConfig.properties
 
-# persistent data of Bastillion is stored here
-VOLUME /opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb
-RUN ln -s /opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb /keydb
-
-# this is the home of Bastillion
-WORKDIR /opt/bastillion
-
-# Bastillion listens on 8443 - HTTPS
-EXPOSE 8443
-
-# Bastillion configuration template for dockerize
 ADD files/BastillionConfig.properties.tpl /opt
-
-# Configure Jetty
 ADD files/jetty-start.ini /opt/bastillion/jetty/start.ini
-
-# Custom Jetty start script
 ADD files/startBastillion.sh /opt/bastillion/startBastillion.sh
 
-# correct permission for running as non-root (f.e. on OpenShift)
 RUN chmod 755 /opt/bastillion/startBastillion.sh && \
-    chgrp -R 0 /opt/bastillion && \
+    chown -R 1000:1000 /opt/bastillion && \
     chmod -R g=u /opt/bastillion
 
-# dont run as root
+VOLUME /keydb
+WORKDIR /opt/bastillion
+EXPOSE 8080 8443
 USER 1000
 
 ENTRYPOINT ["/usr/local/bin/dockerize"]
