@@ -3,21 +3,22 @@
 
 **Orignially Developed by: [e-COSI](https://github.com/e-COSI)**
 
-I updated the deprecated base image to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
+I updated `bastillion` to `3.14.0` to address CVE-2021-44228 and CVE-2021-45046 aka Log4Shell, i also updated the deprecated base image to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
 * `linux/amd64`
 * `linux/arm64`
 * `linux/arm/v7`
 
-I also create `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0-alpine`) and added a Github Action to build the image for:
+I also created a `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0-alpine`) and added a Github Action to build the image for:
 * `linux/amd64`
 * `linux/arm64`
 
+There is a full upgrade path available from the `latest` `e-COSI/docker-bastillion:3.09.00` image.
 For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags)
 
 The base images are automatically updated.
 
 ## Upgrade to the latest version
-Before upgrading to the next version make sure to read the [release notes](https://github.com/bastillion-io/Bastillion/releases), check if you need to migrate your settings and database.
+Before upgrading to the next version make sure to read the [release notes](https://github.com/mietzen/bastillion/releases), check how to migrate your settings and database.
 ## What is Bastillion?
 Bastillion is an open-source web-based SSH console that centrally manages administrative access to systems.
 A bastion host for administrators with features that promote infrastructure security, including key management and auditing.
