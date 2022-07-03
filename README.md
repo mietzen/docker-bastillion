@@ -1,43 +1,53 @@
-# docker-bastillion
-Docker image for [Bastillion.io](https://www.bastillion.io/)
+# Bastillion Docker Image
+This is a fork of [e-COSI/docker-bastillion](https://github.com/e-COSI/docker-bastillion) Docker image for [Bastillion.io](https://www.bastillion.io/) by developed by [e-COSI](https://github.com/e-COSI).
+I updated the deprecated base image to [eclipse-temurin:18-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
+* `linux/amd64`
+* `linux/arm64`
+* `linux/arm/v7`
 
+The Docker images are automatically tage with the bastillion version.
+
+## Upgrade to the latest version
+Before upgrading to the next version make sure to read the [release notes](https://github.com/bastillion-io/Bastillion/releases), check if you need to migrate your settings and database.
 ## What is Bastillion?
-
 Bastillion is an open-source web-based SSH console that centrally manages administrative access to systems.
-
 A bastion host for administrators with features that promote infrastructure security, including key management and auditing.
-
 For more information visit the [Bastillion website](https://www.bastillion.io/) or the [GitHub page](https://github.com/bastillion-io/Bastillion)
 
-## Quick start
-
-Create a directory where you want to store the Bastillion data: 
-
-`mkdir keydb/`
-
-Docker-Bastillion runs as user 1001. Not as root. You must change ownership of the keydb directory to 1001. Chown the directory to 1001: 
-
-`chown -R 1001:1001 keydb/`
-
-Run the docker image. The below example runs the image detached. Update the path to the keydb directory as required: 
-
-`
-sudo docker run -d -p 8080:8080 -p 8443:8443 -v /PATH/TO/keydb:/opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb ecosi/bastillion
-`
-
-From a web browser, navigate to `https://<Instance IP>:8080` and login with:
-
-```
-username:admin
-password:changeme
+## Start with `docker run`
+Start Bastillion with `docker run` on your local host:
+```Shell
+$ docker run -d -p 8080:8080 -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
 ```
 
-## Persistent storage
-_Currently not configurable using environment (need confirmation)_
+Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
+* Username: `admin`
+* Password: `changeme`
 
-This means that any volume must be mounted to the following path in the container: `/opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb`
+## Start using `docker-compose`
 
-## Environment
+```
+version: "3"
+services:
+  bastillion:
+    image: mietzen/bastillion:3.14.0
+    container_name: bastillion
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+      - 8443:8443
+    volumes:
+      - ./keydb:/keydb
+```
+
+Run with:
+```Shell
+$ docker-compose up -d
+```
+
+See also: [docker-compose.yaml](docker-compose.yaml)
+
+## Full Environment Variable list:
 _Dockerize is used to generate a configuration file for the application_
 
 * **set to true to regenerate and import SSH keys**
@@ -156,8 +166,6 @@ _Dockerize is used to generate a configuration file for the application_
    `SESSION_TIMEOUT`
    
    _Default: "15"_
-
-#### Database and connection pool settings
 
 * **Database user**
 
