@@ -3,19 +3,21 @@
 
 **Orignially Developed by: [e-COSI](https://github.com/e-COSI)**
 
-I updated `bastillion` to `3.14.0` to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q) and [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka Log4Shell, i also updated the deprecated base image to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
+I updated `bastillion` to `3.14.0` to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q), [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka Log4Shell and updated the deprecated base image fom `openJDK` to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) 
+There are now Github Actiona to build the image for:
 * `linux/amd64`
 * `linux/arm64`
 * `linux/arm/v7`
 
-I also created a `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0-alpine`) and added a Github Action to build the image for:
+And to build `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0-alpine`) for:
 * `linux/amd64`
 * `linux/arm64`
 
-There is a full upgrade path available from the `latest` `e-COSI/docker-bastillion:3.09.00` image.
-For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags)
+The is a full upgrade path is available from the `latest` `e-COSI/docker-bastillion:3.09.00` image to `3.14.0`.
 
-The base images are automatically updated.
+For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags?page=1&ordering=name)
+
+The base images are nightly updated.
 
 ## Upgrade to the latest version
 Before upgrading to the next version make sure to read the [release notes](https://github.com/n-stone/docker-bastillion/releases), check how to migrate your settings and database.
