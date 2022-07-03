@@ -8,6 +8,8 @@ ENV BASTILLION_VERSION=${BASTILLION_VERSION} \
     BASTILLION_FILENAME=${BASTILLION_FILENAME_VERSION} \
     DOCKERIZE_VERSION=0.6.1
 
+RUN apt update && apt dist-upgrade -y
+
 ADD https://github.com/bastillion-io/Bastillion/releases/download/v${BASTILLION_VERSION}/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz /tmp/
 ADD https://github.com/jwilder/dockerize/releases/download/v${DOCKERIZE_VERSION}/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz /tmp/
 
