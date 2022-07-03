@@ -3,7 +3,7 @@
 
 **Orignially Developed by: [e-COSI](https://github.com/e-COSI)**
 
-I updated `bastillion` to `3.14.0` to address CVE-2021-44228 and CVE-2021-45046 aka Log4Shell, i also updated the deprecated base image to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
+I updated `bastillion` to `3.14.0` to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q) and [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka Log4Shell, i also updated the deprecated base image to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
 * `linux/amd64`
 * `linux/arm64`
 * `linux/arm/v7`
