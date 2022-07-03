@@ -1,0 +1,32 @@
+version: "3"
+services:
+  bastillion:
+    image: mietzen/bastillion:3.14.0
+    container_name: bastillion
+    restart: unless-stopped
+    environment:
+    # Optional Settings
+      - RESET_APPLICATION_SSH_KEY=false # set to true to regenerate and import SSH keys
+      - SSH_KEY_TYPE=rsa # SSH key type 'dsa', 'rsa', or 'ecdsa' for generated keys
+      - SSH_KEY_LENGTH=2048 # SSH key length for generated keys 2048 => 'rsa','dsa'; 521 => 'ecdsa'
+      - SSH_PRIVATE_KEY="" # Provide path to private keyfile leave blank to generate key pair
+      - SSH_PUBLIC_KEY= "" # Provide path to public keyfile leave blank to generate key pair
+      - defaultSSHPassphrase="" # default passphrase leave blank for key without passphrase
+      - ENABLE_INTERNAL_AUDIT=false # Enable Audit
+      - DELETE_AUDIT_LOG_AFTER=90 # keep audit logs for in days
+      - SERVER_ALIVE_INTERVAL=60 # The number of seconds that the client will wait before sending a null packet to the server to keep the connection alive
+      - AGENT_FORWARDING=false # enable SSH agent forwarding*
+      - ONE_TIME_PASSWORD=optional # enable two-factor authentication with a one-time password 'required', 'optional', or 'disabled'
+      - KEY_MANAGEMENT_ENABLED=true # set to false to disable key management if false, the Bastillion public key will be appended to the authorized_keys file (instead of it being overwritten completely).
+      - FORCE_USER_KEY_GENERATION=true # set to true to generate keys when added/managed by users and enforce strong passphrases set to false to allow users to set their own public key
+      - AUTH_KEYS_REFRESH_INTERVAL=120 # authorized_keys refresh interval in minutes (no refresh for <=0)
+      - CLIENT_IP_HEADER='' # HTTP header to identify client IP Address ('X-FORWARDED-FOR')
+      - SESSION_TIMEOUT=15 #The session time out value of application in minutes
+      - DB_USER=bastillion # Database user
+      - DB_PASSWORD='' #Database password
+      - DB_CONNECTION_URL='jdbc:h2:keydb/bastillion;CIPHER=AES' #Connection URL to the DB
+    ports:
+      - 8080:8080
+      - 8443:8443
+    volumes:
+      - ./keydb:/keydb
