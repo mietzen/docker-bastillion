@@ -34,6 +34,6 @@ jobs:
           docker buildx build -t “${DOCKER_USER}/bastillion:latest” \
             --platform linux/amd64 linux/arm64 linux/arm/v7 \
             --build-arg BASTILLION_VERSION=3.14.0 \
-            --build-arg BASTILLION_FILENAME_VERSION=3.14_00
+            --build-arg BASTILLION_FILENAME_VERSION=3.14_00 \
             --push .
       
