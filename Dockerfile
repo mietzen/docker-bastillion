@@ -1,6 +1,6 @@
 FROM openjdk:9-slim
 
-LABEL maintainer="e-COSI <tech@e-cosi.com>"
+LABEL maintainer="Nils Stein <social.nstein@mailbox.org>"
 
 ARG BASTILLION_VERSION
 ARG BASTILLION_FILENAME_VERSION
@@ -25,6 +25,7 @@ RUN apt-get update && apt-get -y install wget && \
 
 # persistent data of Bastillion is stored here
 VOLUME /opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb
+RUN ln -s /opt/bastillion/jetty/bastillion/WEB-INF/classes/keydb /keydb
 
 # this is the home of Bastillion
 WORKDIR /opt/bastillion
@@ -47,7 +48,7 @@ RUN chmod 755 /opt/bastillion/startBastillion.sh && \
     chmod -R g=u /opt/bastillion
 
 # dont run as root
-USER 1001
+USER 1000
 
 ENTRYPOINT ["/usr/local/bin/dockerize"]
 CMD ["-template", \
