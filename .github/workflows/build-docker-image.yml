@@ -28,10 +28,8 @@ jobs:
         uses: docker/setup-buildx-action@v2
       -
         name: Build
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
-          docker buildx build -t "${DOCKER_USER}/bastillion:latest" \
+          docker buildx build -t mietzen/bastillion:latest \
             --platform linux/amd64,linux/arm64,linux/arm/v7 \
             --build-arg BASTILLION_VERSION=3.14.0 \
             --build-arg BASTILLION_FILENAME_VERSION=3.14_00 \
