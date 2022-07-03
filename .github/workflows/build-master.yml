@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  build-ubuntu:
     runs-on: ubuntu-latest
     steps:
       -
@@ -39,3 +39,37 @@ jobs:
             --platform linux/amd64,linux/arm64,linux/arm/v7 \
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} .
+
+  build-alpine:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      - 
+        name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_DEPLOY_KEY }}
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+        run: |
+          BASTILLION_VERSION=$(curl -sL https://api.github.com/repos/bastillion-io/Bastillion/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)
+          BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
+          # Fix for 3.14.0
+          if [ "${#BASTILLION_FILENAME_VERSION}" -lt 8 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
+          docker buildx build -t "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine" \
+            --platform linux/amd64,linux/arm64 \
+            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
+            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
+            --file ./Dockerfile.alpine .

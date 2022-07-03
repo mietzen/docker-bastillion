@@ -1,14 +1,20 @@
 # Bastillion Docker Image
 **This is a fork of: [e-COSI/docker-bastillion](https://github.com/e-COSI/docker-bastillion) Docker image for [Bastillion.io](https://www.bastillion.io/)**
 
-**Developed by: [e-COSI](https://github.com/e-COSI)**
+**Orignially Developed by: [e-COSI](https://github.com/e-COSI)**
 
-I updated the deprecated base image to [eclipse-temurin:18-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
+I updated the deprecated base image to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) and added a Github Action to build the image for:
 * `linux/amd64`
 * `linux/arm64`
 * `linux/arm/v7`
 
-The Docker images are automatically taged with the bastillion version.
+I also create `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0-alpine`) and added a Github Action to build the image for:
+* `linux/amd64`
+* `linux/arm64`
+
+For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags)
+
+The base images are automatically updated.
 
 ## Upgrade to the latest version
 Before upgrading to the next version make sure to read the [release notes](https://github.com/bastillion-io/Bastillion/releases), check if you need to migrate your settings and database.

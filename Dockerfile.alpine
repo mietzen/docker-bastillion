@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre
+FROM alpine:3.16
 LABEL maintainer="Nils Stein <social.nstein@mailbox.org>"
 
 ARG BASTILLION_VERSION
@@ -8,7 +8,8 @@ ENV BASTILLION_VERSION=${BASTILLION_VERSION} \
     BASTILLION_FILENAME=${BASTILLION_FILENAME_VERSION} \
     DOCKERIZE_VERSION=0.6.1
 
-RUN apt-get update && apt-get dist-upgrade -y
+RUN apk update && apk upgrade -U -a
+RUN apk --no-cache add openjdk17-jre bash
 
 ADD https://github.com/bastillion-io/Bastillion/releases/download/v${BASTILLION_VERSION}/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz /tmp/
 ADD https://github.com/jwilder/dockerize/releases/download/v${DOCKERIZE_VERSION}/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz /tmp/
