@@ -1,0 +1,59 @@
+name: Refresh base images
+
+on: 
+  schedule:
+   - cron: "0 23 * * *"
+
+jobs:
+  setup:
+      runs-on: ubuntu-latest
+      outputs:
+        matrix: ${{ steps.matrix.outputs.value }}
+      steps:
+        - 
+          id: matrix
+          run: |
+            tags=$(python -c "import subprocess; import json; s = subprocess.Popen([\"curl -sSlq -X GET https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags | jq -r '.[].ref' | cut -d'/' -f3 | cut -d'v' -f2\"], shell=True, stdout=subprocess.PIPE).stdout; print(json.dumps(s.read().decode('utf-8').splitlines()))")
+            echo "::set-output name=value::$tags"
+  buildx:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        value: ${{fromJson(needs.setup.outputs.matrix)}}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ matrix.value }}
+      - 
+        name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      - 
+        name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_DEPLOY_KEY }}
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build
+        env:
+          BASTILLION_VERSION: ${{ steps.get_version.outputs.VERSION }}
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+        run: |
+          BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
+          # Fix for 3.14.0
+          if [ "${#BASTILLION_FILENAME_VERSION}" -lt 8 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
+          docker buildx build -t "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}" \
+            --platform linux/amd64,linux/arm64,linux/arm/v7 \
+            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
+            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
+            --push .
