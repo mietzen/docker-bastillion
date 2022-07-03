@@ -37,6 +37,6 @@ jobs:
           if [ "${#BASTILLION_FILENAME_VERSION}" -lt 8 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
           docker buildx build -t "${DOCKER_USER}/bastillion:latest" \
             --platform linux/amd64,linux/arm64,linux/arm/v7 \
-            --build-arg BASTILLION_VERSION=$BASTILLION_VERSION \
-            --build-arg BASTILLION_FILENAME_VERSION=$BASTILLION_FILENAME_VERSION \
+            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
+            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
             --push .
