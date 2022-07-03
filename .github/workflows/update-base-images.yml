@@ -15,20 +15,15 @@ jobs:
         id: matrix
         run: |
           tags=$(python -c "import subprocess; import json; s = subprocess.Popen([\"curl -sSlq -X GET https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags | jq -r '.[].ref' | cut -d'/' -f3 | cut -d'v' -f2\"], shell=True, stdout=subprocess.PIPE).stdout; print(json.dumps(s.read().decode('utf-8').splitlines()))")
-          echo $tags
-          echo "::set-output name=TAGS::{\"tag\":$tags}"
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - 
-        run: echo ${{needs.setup.outputs.matrix}}
-  buildx:
+          echo "::set-output name=TAGS::{\"tag\":$tags}"     
+  build:
     runs-on: ubuntu-latest
     needs: setup
     strategy:
       matrix: ${{fromJson(needs.setup.outputs.matrix)}}
     steps:
+      - 
+        run: echo ${{ matrix.tag }}
       -
         name: Checkout
         uses: actions/checkout@v3
