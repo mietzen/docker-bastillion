@@ -20,7 +20,7 @@ jobs:
           docker_bastillion_releases = json.loads(requests.get('https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags').content.decode('utf-8'))
           latest_docker_bastillion = [x['ref'].split('/')[-1] for x in docker_bastillion_releases][-1:][0]
           bastillion_releases = json.loads(requests.get('https://api.github.com/repos/bastillion-io/Bastillion/git/matching-refs/tags').content.decode('utf-8'))
-          releases_to_build = ['3.15.0']
+          releases_to_build = ['3.08.00']
           for i in bastillion_releases:
               curr_relase = i['ref'].split('/')[-1].replace('v','')
               if version.parse(curr_relase) > version.parse(latest_docker_bastillion):
@@ -39,6 +39,19 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3    
       - 
+        name: Get Body
+        id: body
+        env:
+          BASTILLION_VERSION: ${{ matrix.tag }}
+        run: |
+          python -c "
+          import requests, json, os
+          releases = json.loads(requests.get('https://api.github.com/repos/bastillion-io/Bastillion/releases').content.decode('utf-8'))
+          for i in releases:
+            if i['name'] == os.getenv('BASTILLION_VERSION'):
+                print('::set-output name=body::' + repr(i['body']))
+          "
+      - 
         name: Create Release
         uses: ncipollo/release-action@v1
         with:
@@ -46,4 +59,5 @@ jobs:
           tag: ${{ matrix.tag }}
           commit: ${{ env.GITHUB_SHA }}
           token: ${{ secrets.PUSH_TOKEN }}
+          body: ${{ steps.body.outputs.body }}
           draft: true
