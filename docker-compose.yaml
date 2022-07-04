@@ -30,3 +30,5 @@ services:
       - 8443:8443
     volumes:
       - ./keydb:/keydb
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

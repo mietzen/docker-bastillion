@@ -32,6 +32,8 @@ Start Bastillion with `docker run` on your local host:
 docker run -d -p 8080:8080 -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
 ```
 
+With `--add-host=host.docker.internal:host-gateway` you will be able to connect to ssh-servers on your lan.
+
 Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
 * Username: `admin`
 * Password: `changeme`
@@ -51,6 +53,13 @@ services:
     volumes:
       - ./keydb:/keydb
 ```
+
+By adding:
+```
+extra_hosts:
+      - "host.docker.internal:host-gateway"
+```
+you will be able to connect to ssh-servers on your lan.
 
 Run with:
 ```shell
