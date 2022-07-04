@@ -19,7 +19,6 @@ jobs:
           from packaging import version
           docker_bastillion_releases = json.loads(requests.get('https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags').content.decode('utf-8'))
           latest_docker_bastillion = [x['ref'].split('/')[-1] for x in docker_bastillion_releases][-1:][0]
-          latest_docker_bastillion = '3.10.00'
           bastillion_releases = json.loads(requests.get('https://api.github.com/repos/bastillion-io/Bastillion/git/matching-refs/tags').content.decode('utf-8'))
           releases_to_build = []
           for i in bastillion_releases:
@@ -27,25 +26,24 @@ jobs:
               if version.parse(curr_relase) > version.parse(latest_docker_bastillion):
                   releases_to_build.append(curr_relase)
           if releases_to_build:
-            print(json.dumps(releases_to_build))
             print('::set-output name=TAGS::{"tag":' + json.dumps(releases_to_build) + '}')
           "
-  # release:
-  #   runs-on: ubuntu-latest
-  #   if: needs.setup.outputs.matrix
-  #   needs: setup
-  #   strategy:
-  #     matrix: ${{fromJson(needs.setup.outputs.matrix)}}
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v3    
-  #     - 
-  #       name: Create Release
-  #       uses: ncipollo/release-action@v1
-  #       with:
-  #         name: ${{ matrix.tag }}
-  #         tag: ${{ matrix.tag }}
-  #         commit: true
-  #         token: ${{ secrets.PUSH_TOKEN }}
-  #         draft: true
+  release:
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.matrix
+    needs: setup
+    strategy:
+      matrix: ${{fromJson(needs.setup.outputs.matrix)}}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3    
+      - 
+        name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{ matrix.tag }}
+          tag: ${{ matrix.tag }}
+          commit: true
+          token: ${{ secrets.PUSH_TOKEN }}
+          draft: true
