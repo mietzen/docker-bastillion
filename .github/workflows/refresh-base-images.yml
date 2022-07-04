@@ -14,12 +14,12 @@ jobs:
       - 
         id: matrix
         run: |
-          tags=$(python -c "
+          python -c "
           import requests, json
-          x = requests.get('https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags')
-          print(json.dumps([x['ref'].split('/')[-1] for x in json.loads(x.content.decode('utf-8'))][-5:]))")
-          echo $tags
-          echo "::set-output name=TAGS::{\"tag\":$tags}"     
+          docker_bastillion_releases = json.loads(requests.get('https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags').content.decode('utf-8'))
+          tags = [x['ref'].split('/')[-1] for x in docker_bastillion_releases]
+          print('::set-output name=TAGS::{"tag":' + json.dumps(tags) + '}')
+          "
   build:
     runs-on: ubuntu-latest
     needs: setup
