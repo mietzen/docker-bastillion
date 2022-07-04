@@ -14,7 +14,11 @@ jobs:
       - 
         id: matrix
         run: |
-          tags=$(python -c "import subprocess; import json; s = subprocess.Popen([\"curl -sSlq -X GET https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags | jq -r '.[].ref' | cut -d'/' -f3 | cut -d'v' -f2\"], shell=True, stdout=subprocess.PIPE).stdout; print(json.dumps(s.read().decode('utf-8').splitlines()))")
+          tags=$(python -c "
+          import requests, json
+          x = requests.get('https://api.github.com/repos/n-stone/docker-bastillion/git/matching-refs/tags')
+          print(json.dumps([x['ref'].split('/')[-1] for x in json.loads(x.content.decode('utf-8'))][-5:]))")
+          echo $tags
           echo "::set-output name=TAGS::{\"tag\":$tags}"     
   build:
     runs-on: ubuntu-latest
