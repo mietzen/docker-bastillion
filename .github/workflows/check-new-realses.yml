@@ -49,7 +49,7 @@ jobs:
           releases = json.loads(requests.get('https://api.github.com/repos/bastillion-io/Bastillion/releases').content.decode('utf-8'))
           for i in releases:
             if i['name'] == os.getenv('BASTILLION_VERSION'):
-                print('::set-output name=body::' + repr(i['body']))
+                print('::set-output name=body::' + i['body'])
           "
       - 
         name: Create Release
