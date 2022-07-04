@@ -44,6 +44,6 @@ jobs:
         with:
           name: ${{ matrix.tag }}
           tag: ${{ matrix.tag }}
-          commit: ${{ GITHUB_SHA }}
+          commit: ${{ env.GITHUB_SHA }}
           token: ${{ secrets.PUSH_TOKEN }}
           draft: true
