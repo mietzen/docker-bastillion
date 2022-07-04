@@ -1,4 +1,4 @@
-name: Refresh base images
+name: Check for new Bastillion releases
 
 on: 
   schedule:
