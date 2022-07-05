@@ -35,7 +35,7 @@ jobs:
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
           # Fix for 3.14.0
           if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
-          docker buildx build -t "${DOCKER_USER}/bastillion:dev" \
+          docker buildx build -t "${DOCKER_USER}/bastillion-dev:latest" \
             --platform linux/amd64,linux/arm64,linux/arm/v7 \
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
@@ -54,7 +54,7 @@ jobs:
         run: |
           mkdir $(pwd)/keydb
           chmod 777 $(pwd)/keydb
-          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:dev"
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion-dev:latest"
           docker exec -u 0 bastillion apt install net-tools
           curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
           inspec --chef-license=accept
@@ -104,7 +104,7 @@ jobs:
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
           # Fix for 3.14.0
           if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
-          docker buildx build -t "${DOCKER_USER}/bastillion:dev-alpine" \
+          docker buildx build -t "${DOCKER_USER}/bastillion-dev:alpine" \
             --platform linux/amd64,linux/arm64 \
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
@@ -123,7 +123,7 @@ jobs:
         run: |
           mkdir $(pwd)/keydb
           chmod 777 $(pwd)/keydb
-          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:dev-alpine"
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion-dev:alpine"
           docker exec -u 0 bastillion apk --no-cache add net-tools
           curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
           inspec --chef-license=accept
