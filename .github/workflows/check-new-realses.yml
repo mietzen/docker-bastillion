@@ -33,6 +33,7 @@ jobs:
     if: needs.check-releases.outputs.matrix
     needs: check-releases
     strategy:
+      max-parallel: 1
       matrix: ${{fromJson(needs.check-releases.outputs.matrix)}}
     steps:
       -
