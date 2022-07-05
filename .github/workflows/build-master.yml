@@ -49,6 +49,8 @@ jobs:
           docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine"
           docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb bastillion:${BASTILLION_VERSION}
           docker exec -u 0 bastillion apt install net-tools
+          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
+          inspec --chef-license=accept
       -
         name: InSpec Integration Test
         run: |
@@ -109,6 +111,8 @@ jobs:
           BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
           docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine"
           docker exec -u 0 bastillion apk --no-cache add net-tools
+          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
+          inspec --chef-license=accept
       -
         name: InSpec Integration Test
         run: |
