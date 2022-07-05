@@ -52,8 +52,8 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}        
         run: |
-          mkdir keydb
-          chown 999:999 keydb
+          mkdir $(pwd)/keydb
+          chmod 777 $(pwd)/keydb
           docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:dev"
           docker exec -u 0 bastillion apt install net-tools
           curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
@@ -121,8 +121,8 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
-          mkdir keydb
-          chown 999:999 keydb        
+          mkdir $(pwd)/keydb
+          chmod 777 $(pwd)/keydb
           docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:dev-alpine"
           docker exec -u 0 bastillion apk --no-cache add net-tools
           curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
