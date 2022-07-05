@@ -42,7 +42,8 @@ jobs:
       -
         name: Setup tests
         run: |
-          docker run -d --name bastillion -v $(pwd)/keydb:/keydb bastillion:${BASTILLION_VERSION}
+          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/bastillion-io/Bastillion/releases/latest | jq -r ".name")
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb bastillion:${BASTILLION_VERSION}
           docker exec -u 0 -it bastillion apt install net-tools
       -
         name: InSpec Integration Test
@@ -98,7 +99,8 @@ jobs:
       -
         name: Setup tests
         run: |
-          docker run -d --name bastillion -v $(pwd)/keydb:/keydb bastillion:${BASTILLION_VERSION}-alpine
+          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/bastillion-io/Bastillion/releases/latest | jq -r ".name")
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "bastillion:${BASTILLION_VERSION}-alpine"
           docker exec -u 0 -it bastillion apk --no-cache add net-tools
       -
         name: InSpec Integration Test
