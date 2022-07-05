@@ -29,12 +29,12 @@ For more information visit the [Bastillion website](https://www.bastillion.io/) 
 ## Start with `docker run`
 Start Bastillion with `docker run` on your local host:
 ```shell
-docker run -d -p 8080:8080 -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
+docker run -d -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
 ```
 
 With `--add-host=host.docker.internal:host-gateway` you will be able to connect to ssh-servers on your lan.
 
-Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
+Go to [https://127.0.0.1:8443](https://127.0.0.1:8443) and login with: 
 * Username: `admin`
 * Password: `changeme`
 
@@ -48,7 +48,6 @@ services:
     container_name: bastillion
     restart: unless-stopped
     ports:
-      - 8080:8080
       - 8443:8443
     volumes:
       - ./keydb:/keydb
@@ -65,7 +64,7 @@ Run with:
 ```shell
 docker-compose up -d
 ```
-Go to [https://127.0.0.1:8080](https://127.0.0.1:8080) and login with: 
+Go to [https://127.0.0.1:8443](https://127.0.0.1:8443) and login with: 
 * Username: `admin`
 * Password: `changeme`
 

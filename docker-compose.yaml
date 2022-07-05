@@ -26,7 +26,6 @@ services:
       - DB_PASSWORD='' #Database password
       - DB_CONNECTION_URL='jdbc:h2:keydb/bastillion;CIPHER=AES' #Connection URL to the DB
     ports:
-      - 8080:8080
       - 8443:8443
     volumes:
       - ./keydb:/keydb

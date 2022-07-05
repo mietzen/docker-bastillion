@@ -25,14 +25,15 @@ ADD files/BastillionConfig.properties.tpl /opt
 ADD files/jetty-start.ini /opt/bastillion/jetty/start.ini
 ADD files/startBastillion.sh /opt/bastillion/startBastillion.sh
 
-RUN chmod 755 /opt/bastillion/startBastillion.sh && \
-    chown -R 1000:1000 /opt/bastillion && \
+RUN useradd --system --no-create-home --user-group --home-dir /opt/bastillion --shell /bin/bash --uid 999 bastillion && \
+    chmod 755 /opt/bastillion/startBastillion.sh && \
+    chown -R 999:999 /opt/bastillion && \
     chmod -R g=u /opt/bastillion
 
 VOLUME /keydb
 WORKDIR /opt/bastillion
-EXPOSE 8080 8443
-USER 1000
+EXPOSE 8443
+USER 999
 
 ENTRYPOINT ["/usr/local/bin/dockerize"]
 CMD ["-template", \
