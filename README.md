@@ -1,9 +1,7 @@
 # Bastillion Docker Image
 **This is a fork of: [e-COSI/docker-bastillion](https://github.com/e-COSI/docker-bastillion) Docker image for [Bastillion.io](https://www.bastillion.io/)**
 
-**Orignially Developed by: [e-COSI](https://github.com/e-COSI)**
-
-I updated `bastillion` to `3.14.0` to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q), [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka Log4Shell and updated the deprecated base image fom `openJDK` to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) 
+I updated `bastillion` to the latest version in order to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q), [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka **Log4Shell** and updated the deprecated base image fom `openJDK` to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) 
 There are now Github Actiona to build the image for:
 * `linux/amd64`
 * `linux/arm64`
@@ -17,7 +15,7 @@ The full upgrade path is available from the `latest` `e-COSI/docker-bastillion:3
 
 For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags?page=1&ordering=name)
 
-The base images are nightly updated.
+The base images are nightly updated and all images are rudimentary tested with [InSpec](https://docs.chef.io/inspec/).
 
 ## Upgrade to the latest version
 Before upgrading to the next version make sure to read the [release notes](https://github.com/n-stone/docker-bastillion/releases), check how to migrate your settings and database.
