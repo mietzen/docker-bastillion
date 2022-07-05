@@ -55,7 +55,7 @@ jobs:
       -
         name: InSpec Integration Test
         run: |
-          inspec exec .test//integration -t docker://bastillion
+          inspec exec ./test/integration -t docker://bastillion
       -
         name: Check logs
         run: |
@@ -118,7 +118,7 @@ jobs:
       -
         name: InSpec Integration Test
         run: |
-          inspec exec .test//integration -t docker://bastillion
+          inspec exec ./test/integration -t docker://bastillion
       -
         name: Check logs
         run: |
