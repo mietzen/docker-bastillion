@@ -9,6 +9,8 @@ on:
 jobs:
   build-ubuntu:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
     steps:
       -
         name: Checkout
@@ -44,8 +46,47 @@ jobs:
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
             --push .
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    needs: build-ubuntu
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3    
+      -
+        name: Setup tests
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          BASTILLION_VERSION: ${{ needs.build-ubuntu.outputs.version }}
+        run: |
+          mkdir $(pwd)/keydb
+          chmod 777 $(pwd)/keydb
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}"
+          docker exec -u 0 bastillion apt install net-tools
+          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
+          inspec --chef-license=accept
+      -
+        name: InSpec Integration Test
+        run: |
+          inspec exec ./test/ubuntu -t docker://bastillion
+      -
+        name: Check logs
+        run: |
+          if $(docker logs bastillion | grep -q Exception -q); then
+            docker logs bastillion
+            exit 1
+          else:
+            echo "No Exceptions"
+          fi
+      -
+        name: Teardown
+        run: |
+          docker container stop bastillion
+          rm -rf keydb
   build-alpine:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
     steps:
       -
         name: Checkout
@@ -81,3 +122,40 @@ jobs:
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
             --push --file ./Dockerfile.alpine .
+  test-alpine:
+    runs-on: ubuntu-latest
+    needs: build-alpine
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup tests
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          BASTILLION_VERSION: ${{ needs.build-alpine.outputs.version }}
+        run: |
+          mkdir $(pwd)/keydb
+          chmod 777 $(pwd)/keydb
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine"
+          docker exec -u 0 bastillion apk --no-cache add net-tools
+          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
+          inspec --chef-license=accept
+      -
+        name: InSpec Integration Test
+        run: |
+          inspec exec ./test/alpine -t docker://bastillion
+      -
+        name: Check logs
+        run: |
+          if $(docker logs bastillion | grep -q Exception); then
+            docker logs bastillion
+            exit 1
+          else:
+            echo "No Exceptions"
+          fi
+      -
+        name: Teardown
+        run: |
+          docker container stop bastillion
+          rm -rf keydb
