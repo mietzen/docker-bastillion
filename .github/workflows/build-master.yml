@@ -31,7 +31,7 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
-          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/bastillion-io/Bastillion/releases/latest | jq -r ".name")
+          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
           # Fix for 3.14.0
           if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
@@ -41,8 +41,11 @@ jobs:
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} .
       -
         name: Setup tests
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}        
         run: |
-          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/bastillion-io/Bastillion/releases/latest | jq -r ".name")
+          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine"
           docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb bastillion:${BASTILLION_VERSION}
           docker exec -u 0 -it bastillion apt install net-tools
       -
@@ -87,7 +90,7 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
-          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/bastillion-io/Bastillion/releases/latest | jq -r ".name")
+          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
           # Fix for 3.14.0
           if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
@@ -98,9 +101,11 @@ jobs:
             --file ./Dockerfile.alpine .
       -
         name: Setup tests
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
-          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/bastillion-io/Bastillion/releases/latest | jq -r ".name")
-          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "bastillion:${BASTILLION_VERSION}-alpine"
+          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
+          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine"
           docker exec -u 0 -it bastillion apk --no-cache add net-tools
       -
         name: InSpec Integration Test
