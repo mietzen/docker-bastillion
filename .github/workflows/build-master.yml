@@ -38,7 +38,7 @@ jobs:
           docker buildx build -t "${DOCKER_USER}/bastillion:dev" \
             --platform linux/amd64,linux/arm64,linux/arm/v7 \
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
-            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} 
+            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
             --push .
   test-ubuntu:
     runs-on: ubuntu-latest
