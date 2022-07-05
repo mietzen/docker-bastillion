@@ -26,7 +26,7 @@ ADD files/BastillionConfig.properties.tpl /opt
 ADD files/jetty-start.ini /opt/bastillion/jetty/start.ini
 ADD files/startBastillion.sh /opt/bastillion/startBastillion.sh
 
-RUN adduser -S -H -h /opt/bastillion -s /bin/bash -u 999 -G 999 bastillion && \
+RUN adduser --system --no-create-home --home /opt/bastillion --shell /bin/bash --uid 999 bastillion && \
     chmod 755 /opt/bastillion/startBastillion.sh && \
     chown -R 999:999 /opt/bastillion && \
     chmod -R g=u /opt/bastillion
