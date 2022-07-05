@@ -39,7 +39,29 @@ jobs:
             --platform linux/amd64,linux/arm64,linux/arm/v7 \
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} .
-
+      -
+        name: Setup tests
+        run: |
+          docker run --rm --name bastillion -it -p 8443:8443 -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}"
+          docker exec -u 0 -it bastillion apt install net-tools
+      -
+        name: InSpec Integration Test
+        run: |
+          inspec exec .test//integration -t docker://bastillion
+      -
+        name: Check logs
+        run: |
+          if [ docker logs bastillion | grep Exception -q ]; then
+            docker logs bastillion
+            exit 1
+          else:
+            echo "No Exceptions"
+          fi
+      -
+        name: Teardown
+        run: |
+          docker container stop bastillion
+          rm -rf keydb
   build-alpine:
     runs-on: ubuntu-latest
     steps:
@@ -73,3 +95,26 @@ jobs:
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
             --file ./Dockerfile.alpine .
+      -
+        name: Setup tests
+        run: |
+          docker run --rm --name bastillion -it -p 8443:8443 -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine"
+          docker exec -u 0 -it bastillion apk --no-cache add net-tools
+      -
+        name: InSpec Integration Test
+        run: |
+          inspec exec .test//integration -t docker://bastillion
+      -
+        name: Check logs
+        run: |
+          if [ docker logs bastillion | grep Exception -q ]; then
+            docker logs bastillion
+            exit 1
+          else:
+            echo "No Exceptions"
+          fi
+      -
+        name: Teardown
+        run: |
+          docker container stop bastillion
+          rm -rf keydb
