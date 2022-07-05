@@ -59,11 +59,11 @@ jobs:
       -
         name: InSpec Integration Test
         run: |
-          inspec exec ./test/integration -t docker://bastillion
+          inspec exec ./test/ubuntu -t docker://bastillion
       -
         name: Check logs
         run: |
-          if [ docker logs bastillion | grep Exception -q ]; then
+          if $(docker logs bastillion | grep -q Exception -q); then
             docker logs bastillion
             exit 1
           else:
@@ -126,11 +126,11 @@ jobs:
       -
         name: InSpec Integration Test
         run: |
-          inspec exec ./test/integration -t docker://bastillion
+          inspec exec ./test/alpine -t docker://bastillion
       -
         name: Check logs
         run: |
-          if [ docker logs bastillion | grep Exception -q ]; then
+          if $(docker logs bastillion | grep -q Exception); then
             docker logs bastillion
             exit 1
           else:
