@@ -1,7 +1,7 @@
 # Bastillion Docker Image
 **This is a fork of: [e-COSI/docker-bastillion](https://github.com/e-COSI/docker-bastillion) Docker image for [Bastillion.io](https://www.bastillion.io/)**
 
-I updated `bastillion` to the latest version in order to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q), [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka **Log4Shell** and updated the deprecated base image fom `openJDK` to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) 
+I updated `bastillion` to the latest version in order to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q), [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka **Log4Shell**, updated the deprecated base image fom `openJDK` to [eclipse-temurin:17-jre](https://hub.docker.com/_/eclipse-temurin/) and because of the arm64 target I build dockerize from source as part of the build.
 
 There are now Github Actiona to build the image for:
 * `linux/amd64`
@@ -26,6 +26,13 @@ A bastion host for administrators with features that promote infrastructure secu
 For more information visit the [Bastillion website](https://www.bastillion.io/) or the [GitHub page](https://github.com/bastillion-io/Bastillion)
 
 ## Start with `docker run`
+On Linux:
+```
+mkdir ./keydb
+sudo chown 999:$(id -g) ./keydb
+sudo chmod 770 ./keydb
+```
+
 Start Bastillion with `docker run` on your local host:
 ```shell
 docker run -d -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
@@ -38,6 +45,13 @@ Go to [https://127.0.0.1:8443](https://127.0.0.1:8443) and login with:
 * Password: `changeme`
 
 ## Start using `docker-compose`
+
+On Linux:
+```
+mkdir /srv/keydb
+sudo chown 999:$(id -g) ./keydb
+sudo chmod 770 ./keydb
+```
 
 ```yaml
 version: "3"
