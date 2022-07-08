@@ -35,6 +35,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       -
         name: Build
+        id: build
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_PLATFORM: ${{ matrix.platform }}
@@ -44,7 +45,7 @@ jobs:
           BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
           ARCH=$(echo "$DOCKER_PLATFORM" | awk -F  "/" '{print $2$3}')
-          echo ::set-output name=ARCH::${ARCH}
+          echo "::set-output name=arch::${ARCH}"
           # Fix for 3.14.0
           if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
           docker buildx build -t "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}-${BUILD_NR}" \
@@ -56,8 +57,9 @@ jobs:
         name: Setup Tests
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-          ARCH: ${{ steps.Build.outputs.ARCH }}
+          ARCH: ${{ steps.build.outputs.arch }}
           DOCKER_PLATFORM: ${{ matrix.platform }}
+          DISTRIBUTION: ${{ matrix.distribution }}
           BUILD_NR: ${{ github.run_number }}
         run: |
           mkdir $(pwd)/keydb
@@ -92,9 +94,8 @@ jobs:
         name: Push image
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-          DOCKER_PLATFORM: ${{ matrix.platform }}
           DISTRIBUTION: ${{ matrix.distribution }}
-          ARCH: ${{ steps.Build.outputs.ARCH }}
+          ARCH: ${{ steps.build.outputs.arch }}
           BUILD_NR: ${{ github.run_number }}
         run: |
           docker tag "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}-${BUILD_NR}" "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}"
