@@ -52,7 +52,7 @@ jobs:
             --platform ${DOCKER_PLATFORM} \
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
-            --file "./Dockerfile.${DISTRIBUTION}" .
+            --file "./Dockerfile.${DISTRIBUTION}" --load .
       -
         name: Setup Tests
         env:
