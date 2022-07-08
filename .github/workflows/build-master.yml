@@ -10,7 +10,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         platform: [linux/amd64, linux/arm64, linux/arm/v7]
         distribution: [debian, alpine]
