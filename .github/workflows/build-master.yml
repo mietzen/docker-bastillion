@@ -77,8 +77,16 @@ jobs:
       -
         name: InSpec Integration Test
         run: |
-          sleep 30
-          docker logs bastillion
+          # Wait for container to spin up
+          end=$(($(date +%s)+60))
+          until $(docker logs bastillion | grep -q "Started ServerConnector"); do 
+            if [ $(date +%s) -ge $end ]; then
+              echo "Container did not spun up in 60 sec"
+              docker logs bastillion
+              exit -1
+            fi
+            sleep 1 
+          done
           inspec exec ./test/integration -t docker://bastillion
       -
         name: Check Logs
