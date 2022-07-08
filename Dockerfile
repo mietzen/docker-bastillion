@@ -20,7 +20,7 @@ ENV BASTILLION_VERSION=${BASTILLION_VERSION} \
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install --no-install-recommends -y \
-        openjdk-11-jdk
+        openjdk-11-jre-headless
 
 ADD https://github.com/bastillion-io/Bastillion/releases/download/v${BASTILLION_VERSION}/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz /tmp/
 

@@ -18,7 +18,7 @@ ENV BASTILLION_VERSION=${BASTILLION_VERSION} \
     BASTILLION_FILENAME=${BASTILLION_FILENAME_VERSION}
 
 RUN apk update && apk upgrade -U -a
-RUN apk --no-cache add openjdk17-jre bash
+RUN apk --no-cache add openjdk11-jre bash
 
 ADD https://github.com/bastillion-io/Bastillion/releases/download/v${BASTILLION_VERSION}/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz /tmp/
 

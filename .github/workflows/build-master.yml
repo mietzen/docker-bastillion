@@ -77,6 +77,8 @@ jobs:
       -
         name: InSpec Integration Test
         run: |
+          sleep 30
+          docker logs bastillion
           inspec exec ./test/integration -t docker://bastillion
       -
         name: Check Logs
