@@ -79,7 +79,8 @@ jobs:
         run: |
           # Wait for container to spin up
           end=$(($(date +%s)+60))
-          until $(docker logs bastillion | grep -q "Started ServerConnector"); do 
+          echo $end
+          until $(docker logs bastillion 2>&1 | grep -q "Started ServerConnector"); do
             if [ $(date +%s) -gt $end ]; then
               echo "Container did not spun up within 60 sec"
               docker logs bastillion
