@@ -83,10 +83,10 @@ jobs:
           echo "waiting for conatiner to spin up..."
           end=$(($(date +%s)+120))
           until $(docker logs bastillion 2>&1 | grep -q "Started ServerConnector"); do
-            echo "Waiting since: $((120+$(date +%s)-$end)) sec"
+            echo "Waiting since: $((120+$(date +%s)-$end)) seconds"
             sleep 1
             if [ $(date +%s) -gt $end ]; then
-              echo "Container did not spun up within 120 sec"
+              echo "Container did not spun up within 120 seconds"
               docker logs bastillion
               break
             fi
