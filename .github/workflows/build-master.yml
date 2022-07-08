@@ -7,13 +7,20 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build-ubuntu:
+  build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64, linux/arm/v7]
+        distribution: [debian, alpine]
+        exclude:
+          - distribution: alpine
+            platform: linux/arm/v7
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
-      - 
+      -
         name: Docker Login
         uses: docker/login-action@v2
         with:
@@ -30,40 +37,45 @@ jobs:
         name: Build
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_PLATFORM: ${{ matrix.platform }}
+          DISTRIBUTION: ${{ matrix.distribution }}
+          BUILD_NR: ${{ github.run_number }}
         run: |
           BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
+          ARCH=$(echo "$DOCKER_PLATFORM" | awk -F  "/" '{print $2$3}')
+          echo ::set-output name=ARCH::${ARCH}
           # Fix for 3.14.0
           if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
-          docker buildx build -t "${DOCKER_USER}/bastillion-dev:latest" \
-            --platform linux/amd64,linux/arm64,linux/arm/v7 \
+          docker buildx build -t "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}-${BUILD_NR}" \
+            --platform ${DOCKER_PLATFORM} \
             --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
             --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
-            --push .
-  test-ubuntu:
-    runs-on: ubuntu-latest
-    needs: build-ubuntu
-    steps:
+            --file "./Dockerfile.${DISTRIBUTION}" .
       -
-        name: Checkout
-        uses: actions/checkout@v3    
-      -
-        name: Setup tests
+        name: Setup Tests
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}        
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          ARCH: ${{ steps.Build.outputs.ARCH }}
+          DOCKER_PLATFORM: ${{ matrix.platform }}
+          BUILD_NR: ${{ github.run_number }}
         run: |
           mkdir $(pwd)/keydb
           chmod 777 $(pwd)/keydb
-          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion-dev:latest"
-          docker exec -u 0 bastillion apt install net-tools
+          docker run -d --platform ${DOCKER_PLATFORM} --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}-${BUILD_NR}"
+          if [[ $DISTRIBUTION == "debian" ]]
+            docker exec -u 0 -it bastillion apt install net-tools procps -y
+          else:
+            docker exec -u 0 bastillion apk --no-cache add net-tools procps
+          fi
           curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
           inspec --chef-license=accept
       -
         name: InSpec Integration Test
         run: |
-          inspec exec ./test/ubuntu -t docker://bastillion
+          inspec exec ./test/integration -t docker://bastillion
       -
-        name: Check logs
+        name: Check Logs
         run: |
           if $(docker logs bastillion | grep -q Exception -q); then
             docker logs bastillion
@@ -76,72 +88,39 @@ jobs:
         run: |
           docker container stop bastillion
           rm -rf keydb
-  build-alpine:
+      -
+        name: Push image
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_PLATFORM: ${{ matrix.platform }}
+          DISTRIBUTION: ${{ matrix.distribution }}
+          ARCH: ${{ steps.Build.outputs.ARCH }}
+          BUILD_NR: ${{ github.run_number }}
+        run: |
+          docker tag "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}-${BUILD_NR}" "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}"
+          docker push "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}-${BUILD_NR}"
+          docker push "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}"
+
+
+  push-shared-tags:
     runs-on: ubuntu-latest
+    needs: build-and-test
     steps:
       -
-        name: Checkout
-        uses: actions/checkout@v3
-      - 
         name: Docker Login
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_DEPLOY_KEY }}
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Build
+        name: Create and push shared manifest
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          BUILD_NR: ${{ github.run_number }}
         run: |
-          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
-          BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
-          # Fix for 3.14.0
-          if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
-          docker buildx build -t "${DOCKER_USER}/bastillion-dev:alpine" \
-            --platform linux/amd64,linux/arm64 \
-            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
-            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
-            --file ./Dockerfile.alpine --push .
-  test-alpine:
-    runs-on: ubuntu-latest
-    needs: build-alpine
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Setup tests
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-        run: |
-          mkdir $(pwd)/keydb
-          chmod 777 $(pwd)/keydb
-          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion-dev:alpine"
-          docker exec -u 0 bastillion apk --no-cache add net-tools
-          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
-          inspec --chef-license=accept
-      -
-        name: InSpec Integration Test
-        run: |
-          inspec exec ./test/alpine -t docker://bastillion
-      -
-        name: Check logs
-        run: |
-          if $(docker logs bastillion | grep -q Exception); then
-            docker logs bastillion
-            exit 1
-          else:
-            echo "No Exceptions"
-          fi
-      -
-        name: Teardown
-        run: |
-          docker container stop bastillion
-          rm -rf keydb
+          docker manifest create ${DOCKER_USER}/bastillion-dev:latest-alpine ${DOCKER_USER}/bastillion-dev:latest-alpine-arm64-${BUILD_NR} ${DOCKER_USER}/bastillion-dev:latest-alpine-amd64-${BUILD_NR}
+          docker manifest push ${DOCKER_USER}/bastillion-dev:latest-alpine 
+          docker manifest create ${DOCKER_USER}/bastillion-dev:latest-debian ${DOCKER_USER}/bastillion-dev:latest-debian-armv7-${BUILD_NR} ${DOCKER_USER}/bastillion-dev:latest-debian-arm64-${BUILD_NR} ${DOCKER_USER}/bastillion-dev:latest-debian-amd64-${BUILD_NR}
+          docker manifest push ${DOCKER_USER}/bastillion-dev:latest-debian 
+          docker manifest create ${DOCKER_USER}/bastillion-dev:latest ${DOCKER_USER}/bastillion-dev:latest-debian-armv7-${BUILD_NR} ${DOCKER_USER}/bastillion-dev:latest-debian-arm64-${BUILD_NR} ${DOCKER_USER}/bastillion-dev:latest-debian-amd64-${BUILD_NR}
+          docker manifest push ${DOCKER_USER}/bastillion-dev:latest

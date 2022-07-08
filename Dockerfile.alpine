@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine3.15 AS dockerize
+FROM golang:1.17-alpine3.16 AS dockerize
 WORKDIR /go/src/github.com/jwilder/dockerize
 ADD https://github.com/n-stone/dockerize/archive/refs/tags/v0.6.2.tar.gz /tmp/
 RUN tar xzf /tmp/v0.6.2.tar.gz -C /tmp/ && \

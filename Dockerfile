@@ -1,4 +1,4 @@
-FROM golang:1.17-buster AS dockerize
+FROM golang:1.17-bullseye AS dockerize
 WORKDIR /go/src/github.com/jwilder/dockerize
 ADD https://github.com/n-stone/dockerize/archive/refs/tags/v0.6.2.tar.gz /tmp/
 RUN tar xzf /tmp/v0.6.2.tar.gz -C /tmp/ && \
@@ -8,7 +8,7 @@ ENV GO111MODULE=on
 RUN go mod tidy
 RUN go install
 
-FROM eclipse-temurin:17-jre
+FROM debian:bullseye-slim
 LABEL maintainer="Nils Stein <social.nstein@mailbox.org>"
 
 ARG BASTILLION_VERSION
@@ -17,7 +17,10 @@ ARG BASTILLION_FILENAME_VERSION
 ENV BASTILLION_VERSION=${BASTILLION_VERSION} \
     BASTILLION_FILENAME=${BASTILLION_FILENAME_VERSION}
 
-RUN apt-get update && apt-get dist-upgrade -y
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install --no-install-recommends -y \
+        openjdk-11-jdk
 
 ADD https://github.com/bastillion-io/Bastillion/releases/download/v${BASTILLION_VERSION}/bastillion-jetty-v${BASTILLION_FILENAME}.tar.gz /tmp/
 
