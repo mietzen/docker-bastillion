@@ -84,7 +84,7 @@ jobs:
             if [ $(date +%s) -gt $end ]; then
               echo "Container did not spun up within 60 sec"
               docker logs bastillion
-              exit -1
+              break
             else:
               echo "waiting..."
               sleep 1
