@@ -66,7 +66,7 @@ jobs:
           chmod 777 $(pwd)/keydb
           docker run -d --platform ${DOCKER_PLATFORM} --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion-dev:latest-${DISTRIBUTION}-${ARCH}-${BUILD_NR}"
           if [[ $DISTRIBUTION == "debian" ]]; then
-            docker exec -u 0 -it bastillion apt install net-tools procps -y
+            docker exec -u 0 bastillion apt install net-tools procps -y
           fi
           if [[ $DISTRIBUTION == "alpine" ]]; then
             docker exec -u 0 bastillion apk --no-cache add net-tools procps
