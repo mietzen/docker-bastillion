@@ -1,0 +1,54 @@
+name: 'Workflow Dispatcher'
+description: 'Trigger a GitHub Action Workflow in a separate repo, show the link and wait for it to finish.'
+author: 'Nils Stein'
+branding:
+  icon: 'fast-forward'
+  color: 'blue'
+inputs:
+  token:
+    description: 'Access token (PAT) for the repo'
+    required: true
+  event_type:
+    description: 'The event type of the repository dispatch'
+    required: true
+  workflow_file_name:
+    description: 'The name of the workflow of the repository dispatch, e.g. main.yaml'
+    required: true
+  repo:
+    description: 'The owner and repository name. For example, Codertocat/Hello-World'
+    required: false
+    default: ${{ github.repository }}
+  input:
+    description: 'Payload for the repository dispatch event'
+    default: "{}"
+    required: false
+  wait_time:
+    description: 'How long to wait between polls (seconds)'
+    default: "10"
+    required: false
+  max_time:
+    description: 'Maximum amount of time to wait for workflow (seconds)'
+    default: "600"
+    required: false
+outputs:
+  workflow-id:
+    description: "ID of the triggered workflow"
+    value: ${{ steps.dispatch.outputs.workflow-id }}
+  conclusion:
+    description: "Result of the triggered workflow"
+    value: ${{ steps.dispatch.outputs.conclusion }}
+runs:
+  using: "composite"
+  steps:
+    - id: dispatch
+      run: |
+        ${{ github.action_path }}/dispatcher.sh
+      shell: bash
+      env:
+        INPUT_EVENT_TYPE: ${{ inputs.event_type }}
+        INPUT_REPO: ${{ inputs.repo }}
+        INPUT_TOKEN: ${{ inputs.token }}
+        INPUT_CLIENT_PAYLOAD: ${{ inputs.input }}
+        INPUT_WAIT_TIME: ${{ inputs.wait_time }}
+        INPUT_MAX_TIME: ${{ inputs.max_time }}
+        INPUT_WORKFLOW_FILE_NAME: ${{ inputs.workflow_file_name }}
