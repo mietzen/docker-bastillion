@@ -9,7 +9,9 @@ on:
       bastillion_ver:
         description: 'Version of Bastillion'     
         required: true
-        default: '3.14.0'
+
+env:
+  default_ver: '3.14.0'
 
 jobs:
   Trigger-Build:
@@ -22,6 +24,6 @@ jobs:
         token: ${{ secrets.PUSH_TOKEN }}
         event_type: Builder
         workflow_file_name: builder.yml
-        input: '{ "image_name": "bastillion-dev", "image_ver": "${{ github.event.inputs.bastillion_ver || \"3.14.0\" }}", "git_ref": "master" }'
+        input: '{ "image_name": "bastillion-dev", "image_ver": "${{ github.event.inputs.bastillion_ver || github.env.default_ver }}", "git_ref": "master" }'
         wait_time: 5
         max_time: 600
