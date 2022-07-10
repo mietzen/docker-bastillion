@@ -1,16 +1,13 @@
-name: Release
+name: Release Trigger
 
 on:
   push:
     tags:
     - '*'
-  workflow_dispatch:
 
 jobs:
-  build-ubuntu:
+  Trigger-Build:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.VERSION }}
     steps:
       -
         name: Checkout
@@ -18,144 +15,13 @@ jobs:
       - 
         name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
-      - 
-        name: Docker Login
-        uses: docker/login-action@v2
+        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+      - name: workflow-dispatcher
+        uses: ./.github/actions/workflow-dispatcher
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_DEPLOY_KEY }}
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Build
-        env:
-          BASTILLION_VERSION: ${{ steps.get_version.outputs.VERSION }}
-          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-        run: |
-          BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
-          # Fix for 3.14.0
-          if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
-          docker buildx build -t "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}" \
-            --platform linux/amd64,linux/arm64,linux/arm/v7 \
-            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
-            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
-            --push .
-  test-ubuntu:
-    runs-on: ubuntu-latest
-    needs: build-ubuntu
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3    
-      -
-        name: Setup tests
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-          BASTILLION_VERSION: ${{ needs.build-ubuntu.outputs.version }}
-        run: |
-          mkdir $(pwd)/keydb
-          chmod 777 $(pwd)/keydb
-          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}"
-          docker exec -u 0 bastillion apt install net-tools
-          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
-          inspec --chef-license=accept
-      -
-        name: InSpec Integration Test
-        run: |
-          inspec exec ./test/ubuntu -t docker://bastillion
-      -
-        name: Check logs
-        run: |
-          if $(docker logs bastillion | grep -q Exception -q); then
-            docker logs bastillion
-            exit 1
-          else:
-            echo "No Exceptions"
-          fi
-      -
-        name: Teardown
-        run: |
-          docker container stop bastillion
-          rm -rf keydb
-  build-alpine:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.VERSION }}
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      - 
-        name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
-      - 
-        name: Docker Login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_DEPLOY_KEY }}
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Build
-        env:
-          BASTILLION_VERSION: ${{ steps.get_version.outputs.VERSION }}
-          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-        run: |
-          BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
-          # Fix for 3.14.0
-          if [ "${#BASTILLION_FILENAME_VERSION}" -lt 7 ]; then BASTILLION_FILENAME_VERSION=$(echo "${BASTILLION_FILENAME_VERSION}0"); fi
-          docker buildx build -t "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine" \
-            --platform linux/amd64,linux/arm64 \
-            --build-arg BASTILLION_VERSION=${BASTILLION_VERSION} \
-            --build-arg BASTILLION_FILENAME_VERSION=${BASTILLION_FILENAME_VERSION} \
-            --push --file ./Dockerfile.alpine .
-  test-alpine:
-    runs-on: ubuntu-latest
-    needs: build-alpine
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Setup tests
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-          BASTILLION_VERSION: ${{ needs.build-alpine.outputs.version }}
-        run: |
-          mkdir $(pwd)/keydb
-          chmod 777 $(pwd)/keydb
-          docker run -d --rm --name bastillion -v $(pwd)/keydb:/keydb "${DOCKER_USER}/bastillion:${BASTILLION_VERSION}-alpine"
-          docker exec -u 0 bastillion apk --no-cache add net-tools
-          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
-          inspec --chef-license=accept
-      -
-        name: InSpec Integration Test
-        run: |
-          inspec exec ./test/alpine -t docker://bastillion
-      -
-        name: Check logs
-        run: |
-          if $(docker logs bastillion | grep -q Exception); then
-            docker logs bastillion
-            exit 1
-          else:
-            echo "No Exceptions"
-          fi
-      -
-        name: Teardown
-        run: |
-          docker container stop bastillion
-          rm -rf keydb
+          token: ${{ secrets.PUSH_TOKEN }}
+          event_type: Builder
+          workflow_file_name: builder.yml
+          input: '{ "image_name": "bastillion", "image_ver": "${{ steps.get_version.outputs.version }}", "git_ref": "${{ steps.get_version.outputs.version }}" }'
+          wait_time: 5
+          max_time: 600

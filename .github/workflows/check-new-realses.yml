@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-releases:
+  Check-for-new-releases:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.TAGS }}
@@ -28,13 +28,13 @@ jobs:
           if releases_to_build:
             print('::set-output name=TAGS::{"tag":' + json.dumps(releases_to_build) + '}')
           "
-  release:
+  Release:
     runs-on: ubuntu-latest
-    if: needs.check-releases.outputs.matrix
+    if: needs.Check-releases.outputs.matrix
     needs: check-releases
     strategy:
       max-parallel: 1
-      matrix: ${{fromJson(needs.check-releases.outputs.matrix)}}
+      matrix: ${{fromJson(needs.Check-releases.outputs.matrix)}}
     steps:
       -
         name: Checkout
