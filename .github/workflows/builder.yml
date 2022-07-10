@@ -76,6 +76,7 @@ jobs:
           DISTRIBUTION: ${{ matrix.distribution }}
           BUILD_NR: ${{ github.run_number }}
         run: |
+          echo "Building: ${DOCKER_USER}/${IMAGE_NAME}:${IMAGE_VER}-${DISTRIBUTION}-${ARCH}-${BUILD_NR} with Bastillion: ${BASTILLION_VERSION}"
           BASTILLION_VERSION=${IMAGE_VER}
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
           ARCH=$(echo "$DOCKER_PLATFORM" | awk -F  "/" '{print $2$3}')
