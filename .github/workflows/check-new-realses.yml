@@ -30,11 +30,11 @@ jobs:
           "
   Release:
     runs-on: ubuntu-latest
-    if: needs.Check-releases.outputs.matrix
-    needs: check-releases
+    if: needs.Check-for-new-releases.outputs.matrix
+    needs: Check-for-new-releases
     strategy:
       max-parallel: 1
-      matrix: ${{fromJson(needs.Check-releases.outputs.matrix)}}
+      matrix: ${{fromJson(needs.Check-for-new-releases.outputs.matrix)}}
     steps:
       -
         name: Checkout
