@@ -76,7 +76,7 @@ jobs:
           DISTRIBUTION: ${{ matrix.distribution }}
           BUILD_NR: ${{ github.run_number }}
         run: |
-          BASTILLION_VERSION=$(curl -sSLq https://api.github.com/repos/n-stone/docker-bastillion/releases/latest | jq -r ".name")
+          BASTILLION_VERSION=${IMAGE_VER}
           BASTILLION_FILENAME_VERSION=$(echo $BASTILLION_VERSION | sed -r 's/(.*)\./\1_/')
           ARCH=$(echo "$DOCKER_PLATFORM" | awk -F  "/" '{print $2$3}')
           echo "::set-output name=arch::${ARCH}"

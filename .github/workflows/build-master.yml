@@ -18,6 +18,6 @@ jobs:
         token: ${{ secrets.PUSH_TOKEN }}
         event_type: Builder
         workflow_file_name: builder.yml
-        input: '{ "image_name": "bastillion-dev", "image_ver": "latest", "git_ref": "master" }'
+        input: '{ "image_name": "bastillion-dev", "image_ver": "3.14.0", "git_ref": "master" }'
         wait_time: 5
         max_time: 600
