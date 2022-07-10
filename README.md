@@ -12,7 +12,25 @@ And to build a `alpine` version taged `-alpine` (e.g. `mietzen/bastillion:3.14.0
 * `linux/amd64`
 * `linux/arm64`
 
-The full upgrade path is available from the `latest` `e-COSI/docker-bastillion:3.09.00` image to `3.14.0`.
+The full upgrade path is available from `e-COSI/docker-bastillion:3.09.00` image to `3.14.0`.
+
+Shared tags:
+```
+3.14.0  -> 3.14.0-debian
+3.13.00 -> 3.13.00-debian 
+3.12.02 -> 3.12.02-debian 
+3.12.01 -> 3.12.01-debian 
+3.12.00 -> 3.12.00-debian 
+3.11.01 -> 3.11.01-debian 
+3.10.00 -> 3.10.00-debian
+3.14.0-alpine
+3.13.00-alpine
+3.12.02-alpine
+3.12.01-alpine
+3.12.00-alpine
+3.11.01-alpine
+3.10.00-alpine
+```
 
 For all tags, see: [DockerHub](https://hub.docker.com/r/mietzen/bastillion/tags?page=1&ordering=name)
 
