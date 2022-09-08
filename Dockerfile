@@ -20,7 +20,7 @@ ENV BASTILLION_VERSION=${BASTILLION_VERSION} \
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install --no-install-recommends -y \
-        openjdk-11-jre-headless && \
+        openjdk-17-jre-headless && \
     apt-get -y autoremove && \
     apt-get clean autoclean && \
     rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
