@@ -3,7 +3,7 @@
 
 I updated `bastillion` to the latest version in order to address [CVE-2021-44228](https://github.com/advisories/GHSA-jfh8-c2jp-5v3q), [CVE-2021-45046](https://github.com/advisories/GHSA-7rjr-3q55-vv33) aka **Log4Shell**, updated the deprecated base image fom `openJDK` to `debian-slim` with `openjdk-11-jre-headless` and because of the arm64 target I build dockerize from source as part of the build.
 
-There are now Github Actiona to build the image for:
+There are now Github Actions to build the image for:
 * `linux/amd64`
 * `linux/arm64`
 * `linux/arm/v7`
@@ -52,7 +52,7 @@ sudo chmod 770 ./keydb
 
 Start Bastillion with `docker run` on your local host:
 ```shell
-docker run -d -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion
+docker run -d -p 8443:8443 -v $(pwd)/keydb:/keydb mietzen/bastillion:3.14.0
 ```
 
 With `--add-host=host.docker.internal:host-gateway` you will be able to connect to ssh-servers on your lan.
