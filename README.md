@@ -1,3 +1,10 @@
+# DO NOT USE! Bastillion is no longer developed: https://github.com/bastillion-io/Bastillion/issues/506#issuecomment-1627688349
+
+**Alternatives:**
+- https://github.com/warp-tech/warpgate
+- https://github.com/ovh/the-bastion
+
+
 # Bastillion Docker Image
 **This is a fork of: [e-COSI/docker-bastillion](https://github.com/e-COSI/docker-bastillion) Docker image for [Bastillion.io](https://www.bastillion.io/)**
 
